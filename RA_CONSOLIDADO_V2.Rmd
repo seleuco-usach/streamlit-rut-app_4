@@ -1,0 +1,478 @@
+---
+title: "R Notebook"
+output:
+  html_document:
+    df_print: paged
+---
+
+RA_2020
+
+```{r RA_2020, echo=F, warning=FALSE}
+#####ARCHIVOS RA 2020##########
+library(dplyr)
+library(googlesheets4)
+library(kableExtra)
+library(DT)
+library(data.table)
+
+#setwd("C:/proyectos r studio/ANALISTA USACH/MATRICULA UNIFICADA/RA_2020")
+setwd("/media/xenomorfo/Windows/proyectos r studio/ANALISTA USACH/MATRICULA UNIFICADA/RA_2020")
+RA_2020_1<-
+  data.frame(fread("MU_2020_Pregrado_Matriculados_V5_Primer_Grupo (8).csv", encoding = "UTF-8"))
+RA_2020_2<-
+  data.frame(fread("MU_2020_Pregrado_Matriculados_V6_Segundo_Grupo_V2 (5).csv", encoding = "UTF-8"))
+RA_2020_3<-
+  data.frame(fread("MU_2020_Pregrado_2020_Matric_Unif_Nuevos_(21-03-2020).csv", encoding = "UTF-8"))
+RA_2020_4<-
+  data.frame(fread("MU_2020_Pregrado_Matriculados_V7_Tercer_Grupo_general.csv", encoding = "UTF-8"))
+RA_2020_5<-
+  data.frame(fread("MU_2020_Pregrado_matriculados_v7_tercer_grupo_cambio_plan.csv", encoding = "UTF-8"))
+RA_2020_6<-
+  data.frame(fread("MU_2020_Pregrado_Matriculados_V6_Segundo_Grupo_V2 (5)_cambio_plan.csv",encoding = "UTF-8"))
+RA_2020_7<-
+  data.frame(fread("MU_2020_Pregrado_matriculado_v7_tercer_grupo_rut_usach.csv",encoding = "UTF-8"))
+RA_2020_8<-
+  data.frame(fread("MU_2020_Pregrado_RA_Estudiantes_via_ingreso_2_nueva_version (3).csv",encoding = "UTF-8"))
+
+####POSTGRADO 2020####
+RA_2020_POST_1<-
+data.frame(fread("MU_2020_Pregrado_RA_Estudiantes_via_ingreso_2_nueva_version (3).csv", encoding = "UTF-8"))
+RA_2020_POST_2<-
+read.csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vTySkqJ9pUDKmOUsN2arF9fEgWfl5G3-EsnNPzehN4BsEv16SjAcDqamL-ryNPrWg/pub?gid=1458233444&single=true&output=csv",
+         encoding = "UTF-8")
+
+
+# NROW(Reduce(intersect, list(names(RA_2020_1),
+#                             names(RA_2020_2),
+#                             names(RA_2020_4),
+#                             names(RA_2020_5),
+#                             names(RA_2020_6),
+#                             names(RA_2020_7),
+#                             names(RA_2020_8),
+#                             names(RA_2020_POST_1),
+#                             names(RA_2020_POST_2))))
+
+
+####RA 2020 CONSOLIDACION####
+RA_2020<-
+  Reduce(function(x, y) merge(x, y, all=T), list(RA_2020_1,
+                                                 RA_2020_2,
+                                                 RA_2020_4,
+                                                 RA_2020_5,
+                                                 RA_2020_6,
+                                                 RA_2020_7,
+                                                 RA_2020_8,
+                                                 RA_2020_POST_1,
+                                                 RA_2020_POST_2))
+
+
+RA_2020_CONSOLIDADA<-
+  RA_2020[,1:NROW(Reduce(intersect, list(names(RA_2020_1),
+                                         names(RA_2020_2),
+                                         names(RA_2020_4),
+                                         names(RA_2020_5),
+                                         names(RA_2020_6),
+                                         names(RA_2020_7),
+                                         names(RA_2020_8))))]
+
+
+RA_2020_CONSOLIDADA<-
+  RA_2020_CONSOLIDADA %>%
+  rename(N_DOC = RUT,
+         SEXO = GENERO,
+         COD_PLAN = PLA_CODALF,
+         PLAN = NOM_PLAN,
+         NAC = COD_PAIS)
+
+RA_2020_CONSOLIDADA$ANHO_RA<-"2020"
+
+RA_2020_CONSOLIDADA<-
+  RA_2020_CONSOLIDADA %>% 
+  # mutate(RA_2020$ANHO_RA<-"2020")%>% 
+  relocate(ANHO_RA, .before = "N_DOC")
+
+# names(RA_2020_CONSOLIDADA)[names(RA_2020_CONSOLIDADA) == "RUT"]<-"N_DOC"
+# names(RA_2020_CONSOLIDADA)[names(RA_2020_CONSOLIDADA) == "PLA_CODALF"]<-"COD_PLAN"
+# 
+# names(RA_2022_CONSOLIDADA)[names(RA_2022_CONSOLIDADA) == "NDOC"]<-"N_DOC"
+# names(RA_2022_CONSOLIDADA)[names(RA_2022_CONSOLIDADA) == "PATERNO"]<-"A_PAT"
+# names(RA_2022_CONSOLIDADA)[names(RA_2022_CONSOLIDADA) == "MATERNO"]<-"A_MAT"
+# names(RA_2022_CONSOLIDADA)[names(RA_2022_CONSOLIDADA) == "NOMBRES"]<-"NOMBRE"
+
+
+#names(RA_2020_CONSOLIDADA)[names(RA_2020_CONSOLIDADA) == "GENERO"]<-"SEXO"
+
+RA_2020_CONSOLIDADA$ANHO_RA<-"2020"
+
+RA_2020_CONSOLIDADA<-
+  RA_2020_CONSOLIDADA %>% 
+  # mutate(RA_2020$ANHO_RA<-"2020")%>% 
+  relocate(ANHO_RA, .before = "N_DOC")
+
+names(RA_2020_CONSOLIDADA)
+
+
+
+# kable(with(RA_2020_CONSOLIDADA, addmargins(table(SEXO))), align = "c", booktabs=TRUE,  caption = paste("RA_", RA_2020_CONSOLIDADA[1,1], sep = ""))%>%
+# kable_styling(font_size = 11, full_width = FALSE, latex_options = c("basic", "cambria", "hold_position", "scale_down"))
+
+# datatable(RA_2020_CONSOLIDADA %>% 
+#             select(ANHO_RA, N_DOC,SEXO, COD_PLAN), 
+#           rownames = F, filter = 'top', extensions = 'Buttons',
+#           caption = paste("RA_", RA_2020_CONSOLIDADA[1,1], sep = ""),
+# options = list(dom='Bfrtip',
+# buttons=c('copy', 'csv', 'excel'),
+# columnDefs = list(list(className = 'dt-center', targets = "_all"))),
+# class = "display nowrap")
+
+```
+
+RA_2021
+
+```{r RA_2021, echo=F, warning=FALSE}
+
+
+#####ARCHIVOS RA 2021######
+#setwd("C:/proyectos r studio/ANALISTA USACH/MATRICULA UNIFICADA/RA_2021")
+setwd("/media/xenomorfo/Windows/proyectos r studio/ANALISTA USACH/MATRICULA UNIFICADA/RA_2021")
+
+RA_2021_PREGRADO<-
+data.frame(fread("RA_2021.csv", encoding = "UTF-8"))
+
+RA_2021_PREGRADO<-
+RA_2021_PREGRADO %>% 
+  rename(SIES = cod.sies)
+
+
+RA_2021_POSTGRADO<-
+data.frame(read.csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vTqAhfv974P-pD3z4F2Wz7frhMZLlGw8JkNQYCikm6FmM5FTOKyIzCW4H-duCikkg/pub?gid=1493412808&single=true&output=csv",
+         encoding = "UTF-8"))
+
+
+
+RA_2021_CONSOLIDADA<-
+Reduce(function(x, y) merge(x, y, all=TRUE), list(RA_2021_POSTGRADO,
+                                                  RA_2021_PREGRADO))
+RA_2021_CONSOLIDADA<-
+RA_2021_CONSOLIDADA %>% 
+  rename(N_DOC = RUT,
+         A_PAT = PATERNO,
+         A_MAT = MATERNO,
+         NOMBRE = NOMBRES,
+         PLAN = PLAN_ESTUDIO,
+         ANIO_ING_ORI = ANIO_INGRESO_CARRERA_ORIGEN,
+         ANIO_ING_ACT = ANIO_INGRESO)
+
+RA_2021_CONSOLIDADA$ANHO_RA<-"2021"
+
+RA_2021_CONSOLIDADA<-
+  RA_2021_CONSOLIDADA %>% 
+  # mutate(RA_2020$ANHO_RA<-"2020")%>% 
+  relocate(ANHO_RA, .before = "N_DOC") %>% 
+  rename(NAC = COD_PAIS_MU)
+
+names(RA_2021_CONSOLIDADA)
+
+# kable(with(RA_2021_CONSOLIDADA, addmargins(table(SEXO))), align = "c", booktabs=TRUE,  caption = paste("RA_", RA_2021_CONSOLIDADA[1,2], sep = ""))%>%
+# kable_styling(font_size = 11, full_width = FALSE, latex_options = c("basic", "cambria", "hold_position", "scale_down"))
+
+# datatable(RA_2021_CONSOLIDADA %>% 
+#             select(ANHO_RA, N_DOC,SEXO, COD_PLAN), 
+#           rownames = F, filter = 'top', extensions = 'Buttons',
+#           caption = paste("RA_", RA_2020_CONSOLIDADA[1,1], sep = ""),
+# options = list(dom='Bfrtip',
+# buttons=c('copy', 'csv', 'excel'),
+# columnDefs = list(list(className = 'dt-center', targets = "_all"))),
+# class = "display nowrap")
+
+```
+
+RA_2022
+
+```{r RA_2022, echo=F, warning=FALSE}
+
+
+#setwd("C:/proyectos r studio/ANALISTA USACH/MATRICULA UNIFICADA/RA_2022")
+setwd("/media/xenomorfo/Windows/proyectos r studio/ANALISTA USACH/MATRICULA UNIFICADA/RA_2022")
+
+RA_2022_1<-
+  data.frame(fread("MU_2022_Pregrado_MAR_31_REG.csv", encoding = "UTF-8"))
+
+RA_2022_1$NDOC<-
+as.character(RA_2022_1$NDOC)
+
+RA_2022_2<-
+data.frame(fread("MU_2022_Pregrado_ABR_4_CA.csv", encoding = "UTF-8"))
+
+names(RA_2022_2)[names(RA_2022_2) == "RUT"]<-"NDOC"
+
+RA_2022_3<-
+data.frame(fread("MU_2022_Pregrado_ABR_4_REG_AD.csv", encoding = "UTF-8"))
+
+names(RA_2022_3)[names(RA_2022_3) == "RUT"]<-"NDOC"
+
+RA_2022_4<-
+data.frame(fread("MU_2022_Pregrado_ABR_6_REG_AD.csv", encoding = "UTF-8"))
+
+names(RA_2022_4)[names(RA_2022_4) == "RUT"]<-"NDOC"
+
+RA_2022_5<-
+data.frame(fread("MU_2022_Pregrado_ABR_6_SA.csv", encoding = "UTF-8"))
+
+names(RA_2022_5)[names(RA_2022_5) == "RUT"]<-"NDOC"
+
+RA_2022_6<-
+data.frame(fread("MU_2022_Pregrado_MAY_2_REG.csv", encoding = "UTF-8"))
+
+RA_2022_7<-
+data.frame(fread("MU_2022_Pregrado_MAY_2_REG_EXT.csv", encoding = "UTF-8"))
+
+RA_2022_8<-
+data.frame(fread("MU_2022_Pregrado_MAY_3_REG.csv", encoding = "UTF-8"))
+
+RA_2022_9<-
+data.frame(fread("MU_2022_Pregrado_MAY_4_CB.csv", encoding = "UTF-8"))
+
+RA_2022_10<-
+data.frame(fread("MU_2022_Pregrado_MAY_5_REG_AD.csv", encoding = "UTF-8"))
+
+RA_2022_11<-
+data.frame(fread("MU_2022_Pregrado_MAY_6_ACT.csv", encoding = "UTF-8"))
+
+RA_2022_11<-
+  RA_2022_11[,-2]
+
+names(RA_2022_11)[names(RA_2022_11) == "N_DOC"]<-"NDOC"
+
+names(RA_2022_11)[names(RA_2022_11) == "A_PAT"]<-"PATERNO"
+names(RA_2022_11)[names(RA_2022_11) == "A_MAT"]<-"MATERNO"
+names(RA_2022_11)[names(RA_2022_11) == "NOMBRE"]<-"NOMBRES"
+names(RA_2022_11)[names(RA_2022_11) == "NAC"]<-"COD_NAC"
+
+
+#####ADICIONALES 2022#####
+RA_2022_12<-
+  data.frame(fread("MU_2022_Pregrado_ABR_6_REG_AD_ERR.csv", encoding = "Latin-1"))
+
+
+
+
+RA_2022_13<-
+  data.frame(fread("MU_2022_Pregrado_MAY_4_CB_2.csv", encoding = "UTF-8"))
+
+RA_2022_14<-
+read.xlsx("MU_2022_Pregrado_MAY_6_ACT_2.xlsx", sheet="Subir")
+
+###POSTGRADO 2022####
+RA_2022_POST_1<-
+fread("MU_2022_Postgrado_Mayo_(19-05-2022)_Rev_Dmn_vipo.csv", encoding = "UTF-8")
+
+# NROW(Reduce(intersect, list(names(RA_2022_1),
+#                             names(RA_2022_2),
+#                             names(RA_2022_3),
+#                             names(RA_2022_4),
+#                             names(RA_2022_5),
+#                             names(RA_2022_6),
+#                             names(RA_2022_7),
+#                             names(RA_2022_8),
+#                             names(RA_2022_9),
+#                             names(RA_2022_10),
+#                             names(RA_2022_12),
+#                             names(RA_2022_13),
+#                             names(RA_2022_14),
+#                             names(RA_2022_POST_1))))
+
+# Reduce(intersect, list(names(RA_2022_1),
+#                             names(RA_2022_2),
+#                             names(RA_2022_3),
+#                             names(RA_2022_4),
+#                             names(RA_2022_5),
+#                             names(RA_2022_6),
+#                             names(RA_2022_7),
+#                             names(RA_2022_8),
+#                             names(RA_2022_9),
+#                             names(RA_2022_10),
+#                             names(RA_2022_12),
+#                             names(RA_2022_14),
+#                             names(RA_2022_POST_1)))
+
+
+RA_2022<-
+Reduce(function(x, y) merge(x, y, all=T), list(RA_2022_1,
+                                               RA_2022_2,
+                                               RA_2022_3,
+                                               RA_2022_4,
+                                               RA_2022_5,
+                                               RA_2022_6,
+                                               RA_2022_7,
+                                               RA_2022_8,
+                                               RA_2022_9,
+                                               RA_2022_10,
+                                               RA_2022_12,
+                                               RA_2022_13,
+                                               RA_2022_14,
+                                               RA_2022_POST_1))
+RA_2022_CONSOLIDADA<-
+RA_2022[,1:NROW(Reduce(intersect, list(names(RA_2022_1),
+                                       names(RA_2022_2),
+                                       names(RA_2022_3),
+                                       names(RA_2022_4),
+                                       names(RA_2022_5),
+                                       names(RA_2022_6),
+                                       names(RA_2022_7),
+                                       names(RA_2022_8),
+                                       names(RA_2022_9),
+                                       names(RA_2022_10),
+                                       names(RA_2022_12),
+                                       names(RA_2022_13),
+                                       names(RA_2022_14))))]
+
+
+RA_2022_CONSOLIDADA<-
+RA_2022_CONSOLIDADA %>% 
+  rename(N_DOC = NDOC,
+         A_PAT = PATERNO,
+         A_MAT = MATERNO,
+         NOMBRE = NOMBRES,
+         PLAN = PLAN_ESTUDIO)
+
+
+RA_2022_CONSOLIDADA$ANHO_RA<-"2022"
+
+
+
+RA_2022_CONSOLIDADA<-
+  RA_2022_CONSOLIDADA %>% 
+  # mutate(RA_2020$ANHO_RA<-"2020")%>% 
+  relocate(ANHO_RA, .before = "N_DOC") %>% 
+  rename(ANIO_ING_ORI = ANIO_INGRESO_CARRERA_ORIGEN,
+         ANIO_ING_ACT = ANIO_INGRESO,
+         JOR = JORNADA)
+
+names(RA_2022_CONSOLIDADA)
+
+# RA_2022_CONSOLIDADA$PLAN<-
+# RA_2022_CONSOLIDADA %>%
+#   mutate(gsub("\xd3", "Ó", PLAN, fixed = TRUE),
+#          gsub("\xc1", "Á", PLAN, fixed = TRUE),
+#          gsub("\xcd", "Í", PLAN, fixed = TRUE),
+#          gsub("\xc9", "É", PLAN, fixed = TRUE))
+# RA_2022_CONSOLIDADA$PLAN<-
+# sub("\xd3", "Ó", RA_2022_CONSOLIDADA$PLAN)
+# RA_2022_CONSOLIDADA$PLAN<-
+# sub("\xc1", "Á", RA_2022_CONSOLIDADA$PLAN)
+# 
+# RA_2022_CONSOLIDADA$PLAN<-
+# sub("\xcd", "Í", RA_2022_CONSOLIDADA$PLAN)
+# 
+# RA_2022_CONSOLIDADA$PLAN<-
+# sub("\xc9", "É", RA_2022_CONSOLIDADA)
+```
+
+RA_2023
+
+```{r, echo=F, warning=FALSE}
+####ARCHIVOS RA 2023######
+
+#setwd("C:/proyectos r studio/ANALISTA USACH/MATRICULA UNIFICADA/RA_2023")
+setwd("/media/xenomorfo/Windows/proyectos r studio/ANALISTA USACH/MATRICULA UNIFICADA/RA_2023")
+
+RA_2023_1<-
+data.frame(fread("(1) MU_2023_Pregrado_Adicionales_(21-08-2023).csv"))
+RA_2023_2<-
+data.frame(fread("(2) MU_2023_Pregrado_Cambios_Traspasos_2023-01_(21-08-2023).csv"))
+RA_2023_4<-
+data.frame(fread("(4) MU_2023_Pregrado_Actualizacion_RUT_(22-08-2023).csv"))
+RA_2023_5<-
+data.frame(fread("(5) MU_2023_Pregrado_Adicionales_2_(22-08-2023).csv"))
+
+RA_2023_CONSOLIDADA<-
+data.frame(fread("RA_2023_CRV.csv", encoding = "UTF-8"))
+
+# names(RA_2023_CONSOLIDADA)[names(RA_2023_CONSOLIDADA) == "PRIMER_APELLIDO"]<-"A_PAT"
+# names(RA_2023_CONSOLIDADA)[names(RA_2023_CONSOLIDADA) == "SEGUNDO_APELLIDO"]<-"A_MAT"
+
+RA_2023_CONSOLIDADA<-
+RA_2023_CONSOLIDADA %>% 
+  rename(A_PAT = PRIMER_APELLIDO,
+         A_MAT = SEGUNDO_APELLIDO,
+         PLAN = NOMBRE.PLAN)
+
+RA_2023_CONSOLIDADA$ANHO_RA<-"2023"
+
+RA_2023_CONSOLIDADA<-
+  RA_2023_CONSOLIDADA %>% 
+  # mutate(RA_2020$ANHO_RA<-"2020")%>% 
+  relocate(ANHO_RA, .before = "N_DOC")
+
+
+#####POSTGRADO 2023####
+
+# Reduce(intersect, list(names(RA_2020_CONSOLIDADA),
+#                        names(RA_2021_CONSOLIDADA),
+#                        names(RA_2022_CONSOLIDADA),
+#                        names(RA_2023_CONSOLIDADA)))
+# 
+# kable(with(RA_2023_CONSOLIDADA, addmargins(table(SEXO))), align = "c", booktabs=TRUE,  caption = paste("RA_", RA_2023_CONSOLIDADA[1,10], sep = ""))%>%
+# kable_styling(font_size = 11, full_width = FALSE, latex_options = c("basic", "cambria", "hold_position", "scale_down"))
+
+
+```
+
+```{r, echo=F, warning=FALSE}
+######CONSOLIDACION TABLAS#########
+
+RA_CONSOLIDADA<-
+Reduce(function(x, y) merge(x, y, all=TRUE), list(RA_2020_CONSOLIDADA,
+                                                  RA_2021_CONSOLIDADA,
+                                                  RA_2022_CONSOLIDADA,
+                                                  RA_2023_CONSOLIDADA))
+
+Reduce(intersect, list(names(RA_2023_CONSOLIDADA),
+                       names(RA_2022_CONSOLIDADA),
+                       names(RA_2021_CONSOLIDADA),
+                       names(RA_2020_CONSOLIDADA)))
+
+RA_CONSOLIDADA<-
+RA_CONSOLIDADA[,1:NROW(Reduce(intersect, list(names(RA_2020_CONSOLIDADA),
+                                         names(RA_2021_CONSOLIDADA),
+                                         names(RA_2022_CONSOLIDADA),
+                                         names(RA_2023_CONSOLIDADA))))]
+
+
+
+
+RA_CONSOLIDADA<-
+data.frame(lapply(RA_CONSOLIDADA, function(column) iconv(column, "UTF-8", "UTF-8")))
+
+kable(with(subset(RA_CONSOLIDADA, SEXO!=""), table(SEXO, ANHO_RA)), align = "c", booktabs=TRUE,  caption = "RA_CONSOLIDADA")%>%
+kable_styling(font_size = 11, full_width = FALSE, latex_options = c("basic", "cambria", "hold_position"))
+
+CPP<-
+tbl(con_3, "CPP_DR") %>% select(everything()) %>% collect()
+
+CPP$COD_PLAN2<-as.character(CPP$COD_PLAN2)
+
+CPP$PLAN_NOMBRE_2<-
+chartr("Á,É,Í,Ó,Ú", "A,E,I,O,U", CPP$PLAN_NOMBRE)
+
+
+RA_CONSOLIDADA<-
+unique(RA_CONSOLIDADA %>%
+    left_join(CPP %>% select(COD_PLAN2, PLAN_NOMBRE_2), 
+              by = c("COD_PLAN" = "COD_PLAN2")) %>%
+    mutate(PLAN = coalesce(PLAN, PLAN_NOMBRE_2)))
+
+RA_CONSOLIDADA<-
+unique(RA_CONSOLIDADA)
+
+# datatable(unique(RA_CONSOLIDADA) %>% 
+#             select(ANHO_RA, N_DOC,SEXO, COD_PLAN, PLAN), 
+#           rownames = F, filter = 'top', extensions = 'Buttons',
+#           caption = "RA_CONSOLIDADA",
+# options = list(dom='Bfrtip',
+# buttons=c('copy', 'csv', 'excel'),
+# columnDefs = list(list(className = 'dt-center', targets = "_all"))),
+# class = "display nowrap")
+
+```
