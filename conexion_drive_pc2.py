@@ -6,7 +6,7 @@ import pandas as pd
 # Configurar el alcance y credenciales
 scope = ['https://spreadsheets.google.com/feeds',
          'https://www.googleapis.com/auth/drive']
-credentials = ServiceAccountCredentials.from_json_keyfile_name('/home/xenomorfo/Descargas/bamboo-sweep-465617-i4-06b9bd6f36a5.json', scope)
+credentials = ServiceAccountCredentials.from_json_keyfile_name('/home/xenomorfo/Descargas/bamboo-sweep-465617-i4-4bb0ff85e8a2.json', scope)
 client = gspread.authorize(credentials)
 #jose-hoyos-usach-cl@bamboo-sweep-465617-i4.iam.gserviceaccount.com 
 # Abrir la hoja de cálculo por ID

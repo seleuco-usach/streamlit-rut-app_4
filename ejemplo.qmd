@@ -1,0 +1,28 @@
+---
+title: "Mi primer reporte en Quarto con Python"
+author: "Xenomorfo"
+format: pdf
+jupyter: python3
+---
+
+## Introducción
+
+Este es un documento Quarto ejecutando **código Python**.
+
+## Ejemplo de código
+
+```{python}
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Dataset simple
+data = {"x": [1,2,3,4,5], "y": [1,4,9,16,25]}
+df = pd.DataFrame(data)
+df
+
+plt.plot(df["x"], df["y"], marker="o")
+plt.title("Gráfico de ejemplo")
+plt.xlabel("X")
+plt.ylabel("Y")
+plt.show()
+```
