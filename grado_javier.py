@@ -38,7 +38,7 @@ for c in columnas.fetchall():
     print(c)
 
 
-pd.read_sql("""SELECT *
+pac_2025=pd.read_sql("""SELECT *
             FROM PAC_2008_2025
             WHERE ano=2025""", con_1)
             
@@ -56,3 +56,46 @@ dfs = [ACADEMICOS_MAYOR_GRADO, ACADEMICOS_MENOR_GRADO]
 
 from functools import reduce
 grado_javier=reduce(lambda left, right: pd.merge(left, right, how='outer'), dfs)
+
+grado_javier['RUT']=grado_javier['RUT'].astype(float)
+
+(
+grado_javier['GRADO INFORMADO EN CERTIFICADO']
+.str.contains("master|magister|magíster", case = False, na=False)
+)
+
+
+
+grado_javier['grado_certificado']=np.where(grado_javier['GRADO INFORMADO EN CERTIFICADO']
+.str.contains("master|magister|magíster|mba|máster|mestre", 
+              case = False, na=False), "magister", 
+np.where(grado_javier['GRADO INFORMADO EN CERTIFICADO']
+.str.contains("doctor|doctora|doctoris|doctorado|doctorat|Doutora|Doutor", 
+              case = False, na=False), "doctor", 
+np.where(grado_javier['GRADO INFORMADO EN CERTIFICADO']
+.str.contains("licenciado|licenciada|Lizentiatin", 
+              case = False, na=False), "licenciatura", 
+np.where(grado_javier['GRADO INFORMADO EN CERTIFICADO']
+.str.contains("especialista|especialidad|subespecialidad|especializacion", 
+              case = False, na=False), "eemm", "profesional"))))
+
+
+#grado_javier['grado_certificado'].value_counts()
+
+
+pac_2025_grado_javier=pac_2025[['rut', 
+          'apellido_paterno', 
+          'apellido_materno',
+          'nombres',
+          'nivel_formacion_corr',
+          'cod_nivel_formacion_corr']]  .merge(grado_javier[['ARCHIVO','RUT',
+                                                       'GRADO REPORTADO A SIES',
+                                                       'GRADO INFORMADO EN CERTIFICADO', 
+                                                       'comentarios',
+                                                       'grado_certificado']], 
+                                                           left_on="rut", right_on="RUT", how="inner")
+
+from gspread_dataframe import set_with_dataframe
+
+set_with_dataframe(spreadsheet.add_worksheet(title="pac_2025_3", rows="4000", cols="90"), 
+                   pac_2025_grado_javier)

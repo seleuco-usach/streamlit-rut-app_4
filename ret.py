@@ -4,6 +4,10 @@ import pandas as pd
 import numpy as np
 from datetime import date
 
+from MAT import MAT   # Importa la variable directamente
+
+
+
 
 ####Tabla cohortes
 TABLA_COH=MAT.loc[MAT['COH'] == 1, ['rut',
@@ -135,7 +139,8 @@ tabla_ret['NIVEL_GLOBAL']=np.where(tabla_ret['CODIGO_CARRERA_x']=="UNICIT", "UNI
     np.where(tabla_ret['CODIGO_CARRERA_x'].str[0:3]=="POS","POSTITUTLO","PREGRADO"))))))
 
 
-
+tabla_ret
 
 set_with_dataframe(spreadsheet.add_worksheet(title="TABLA_MU_3", 
-                                             rows=5000, cols= 10), tabla_ret[tabla_ret['NIVEL_GLOBAL']=="PREGRADO"])
+                                             rows=5000, cols= 10), 
+                                             tabla_ret[tabla_ret['NIVEL_GLOBAL']=="PREGRADO"])

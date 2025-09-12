@@ -68,6 +68,7 @@ titulados_coh=pd.read_sql("""SELECT
           t.NOMBRE_TIT_GRADO,
           t.rut_cod_plan,
           LEFT(t.FECHA_TITULO, 4) AS ANHO_TIT,
+          LEFT(t.FECHA_RESOL, 4) AS ANHO_RES,             
           RIGHT(c.INGRESO,2) AS Periodo_Ing,
           COUNT(DISTINCT c.RUT) AS frec,
           CONCAT(c.RUT, '-', c.COD_PLAN) AS id,
@@ -128,6 +129,8 @@ titulados_coh['ANHO_INI']=pd.to_datetime(titulados_coh['ANHO_INI'],
                                          format='%Y-%m-%d')
 titulados_coh['FECHA_TITULO']=pd.to_datetime(titulados_coh['FECHA_TITULO'], 
                                              format='%Y-%m-%d')
+
+
 
 #titulados_coh['Duracion_semestres']=((titulados_coh['FECHA_TITULO'] - 
 #                                      titulados_coh['ANHO_INI']).dt.days/30)/6
@@ -207,6 +210,17 @@ pd.set_option('display.width', None)
 #                        'exacto',
 #                        ])\
 #     .size()
-
-
+(
+titulados_coh[(titulados_coh['NIVEL_TIT_GRADO']=="TERMINAL") &
+              (titulados_coh['CODIGO_CARRERA']=="MAGCM")]
+.groupby(['ANHO', 
+          'CODIGO_CARRERA',
+          'NIVEL_TIT_GRADO',
+          'ANHO_TIT',
+          'ANHO_RES',
+          'SEXO'])['RUT']
+.nunique()
+.reset_index(name="tot tit")
+.to_clipboard()
     
+)

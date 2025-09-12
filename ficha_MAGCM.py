@@ -1,14 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Aug 18 10:27:34 2025
-
-@author: xenomorfo
-"""
-
-
-
-
 
 import pyodbc
 import pandas as pd
@@ -41,30 +30,19 @@ columnas=cursor_1.execute("SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA
 
 for c in columnas.fetchall():
     print(c)
-    
-pd.read_sql("""SELECT
-            ANHO_MU,
-            NIV_GLO,
-            COUNT(N_DOC) AS TOT
-            FROM TABLA_MU
-            WHERE VIG=1 AND UNICIT='NO UNICIT' AND ANHO_MU>2017
-            GROUP BY 
-            ANHO_MU,
-            NIV_GLO""", con_1)
 
 
-MU=pd.read_sql("""SELECT
-            N_DOC,
-            COD_SIES,
-            ANHO_MU,
-            NIV_GLO,
-            primer_anio
-            FROM TABLA_MU
-            WHERE VIG=1 AND 
-            UNICIT='NO UNICIT' AND 
-            ANHO_MU>2020 AND 
-            NIV_GLO<>'POSTITULO'""", con_1)
-            
+inscripcion_2025=pd.read_sql("""SELECT 
+            RUT_ESTUDIANTE,
+            COD_PLAN,
+            PERIODO,
+            ASIGNATURA,
+            COD_ASIG
+            FROM INSCRIPCION_2025
+            WHERE COD_PLAN=9224""", con_1).drop_duplicates()
+
+
+
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import pandas as pd
@@ -75,13 +53,13 @@ scope = ['https://spreadsheets.google.com/feeds',
          'https://www.googleapis.com/auth/drive']
 credentials = ServiceAccountCredentials.from_json_keyfile_name('/home/xenomorfo/Descargas/bamboo-sweep-465617-i4-06b9bd6f36a5.json', scope)
 client = gspread.authorize(credentials)
-#jose-hoyos-usach-cl@bamboo-sweep-465617-i4.iam.gserviceaccount.com 
-# Abrir la hoja de cálculo por ID
-spreadsheet = client.open_by_key('1paFv1Dn2mcRubtCgVHL1xPmLPN9T9bvZr4JGVGqByaU')
+
+
 credentials = ServiceAccountCredentials.\
 from_json_keyfile_name('/home/xenomorfo/Descargas/bamboo-sweep-465617-i4-06b9bd6f36a5.json', scope)
-# Abrir la hoja de cálculo por ID
 
 
+spreadsheet = client.open_by_key('1Cug89XL65vKHc5hBlgBXlQmq9ksMJfo3yDahAINJRBI')
 
-set_with_dataframe(spreadsheet.add_worksheet(title="TABLA_MU_2", rows=130000, cols= 20), MU)
+set_with_dataframe(spreadsheet.add_worksheet(title="planeacion-inscripcion", rows=1000, cols= 10), 
+                   inscripcion_2025)

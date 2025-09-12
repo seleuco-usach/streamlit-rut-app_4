@@ -34,7 +34,7 @@ for t in cursor_1.fetchall():
 
 cursor_1 = con_1.cursor()
 columnas=cursor_1.execute("SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.\
-                          COLUMNS WHERE TABLE_NAME='TABLA_MU';")
+                          COLUMNS WHERE TABLE_NAME='DEMRE_E_2014_2025';")
 
 for c in columnas.fetchall():
     print(c)
@@ -81,7 +81,7 @@ MAT=pd.read_sql("""
                 cc.Columna2 AS depto,
                 mu.NAC,
                 COUNT(m.rut) AS Total
-            FROM MATRICULA_V2_082025_PARA_TODO m
+            FROM MATRICULA m
             LEFT JOIN DEMRE_E_2014_2025 d 
             ON CONCAT(m.rut, '-',LEFT(m.ingreso_plan, 4))=d.ID_ANHO
             LEFT JOIN CPP_DR c
@@ -175,22 +175,9 @@ VIA_ING_ANIO=[81,63,26,29,	21,	66,	50,	15,	20,	49,	17,	60,	72,	43,	71,	10,
               88,39]
 
 
-VIA_ING_ANIO_CIDI=[10,11,12,13,	14,	15,	16,	17,	18,	19,	20,	21,	22,	
-                   23,24,25,26,	27,	28, 29, 30, 31, 33,	34,	37,	38,	
-                   39,40,41,43,	44,	49,	50,	52,	53,	54,	55, 57, 58,
-                   59,60,61,62,	63,	64,	65,	66,	68,	70,	71,	72,	73,	
-                   74,75,76,77,	78,	80,	79,	81,	82,	83,	84,	85,	86,	
-                   87,88,89,91,	92,	95,	97,	99]
-
-
-
 ###Definición cohorte
 MAT['COH']=np.where((np.isin(MAT['cod_via'], VIA_ING_ANIO).astype(int)==1) & 
          (MAT['ANHO_MAT']==MAT['ANHO_ING']),1,0)
-
-MAT['COH_CIDI']=np.where((np.isin(MAT['cod_via'], VIA_ING_ANIO_CIDI).astype(int)==1) & 
-         (MAT['ANHO_MAT']==MAT['ANHO_ING']),1,0)
-
 
 MAT['id-anonimo']=MAT['rut']*25+MAT['ANHO_MAT']
 
@@ -208,41 +195,58 @@ informado_sies_2=pd.read_sql("""SELECT
 MAT['INFORMADO_SIES']=MAT['ANHO_SIES_RUT'].isin(informado_sies_2['ANHO_SIES_RUT']).astype(int)
 
 
+
+
 #rut_buscado=int(input("Ingresa rut:"))
 
 
 ###busqueda rut
 #if rut_buscado in MAT['rut'].values:
- #   print(MAT.loc[MAT['rut']==rut_buscado, 
-  #                            ['rut', 
-   #                            'ANHO_ING',
-    #                           'ANHO_MAT',
-     #                          'fecha_nac',
-      #                         'CODIGO_CARRERA',
-       #                        'cod_plan',
-        #                       'SIES']])
+#    print(MAT.loc[MAT['rut']==rut_buscado, 
+#                              ['rut', 
+#                               'ANHO_ING',
+#                               'ANHO_MAT',
+#                               'fecha_nac',
+#                               'CODIGO_CARRERA',
+#                               'cod_plan',
+#                               'SIES']])
 #else: print("no encontrado")
 
-def buscar_rut(MAT):
-    rut_buscado = int(input("Ingresa rut: "))
+
+
+import ipywidgets as widgets
+from IPython.display import display
+
+rut_box = widgets.Text(
+    value='',
+    placeholder='Ingresa rut...',
+    description='RUT:',
+    disabled=False
+)
+
+display(rut_box)
+
+def buscar_rut(change):
+    rut_buscado = int(change.get('new'))
     if rut_buscado in MAT['rut'].values:
-        print(MAT.loc[MAT['rut'] == rut_buscado, [
-            'rut', 
-            'ANHO_ING', 
-            'ANHO_MAT', 
-            'fecha_nac', 
-            'CODIGO_CARRERA', 
-            'cod_plan', 
-            'SIES',
-            'GRUPO_DEPENDENCIA',
-            'via_ingreso',
-            'COH'
-        ]])
+        display(MAT.loc[MAT['rut'] == rut_buscado, 
+                        ['rut', 'ANHO_ING', 'ANHO_MAT',
+                         'fecha_nac', 'CODIGO_CARRERA',
+                         'cod_plan', 'SIES']])
     else:
-        print("no encontrado")
+        print("No encontrado")
+
+rut_box.observe(buscar_rut, names='value')
+
+
+
+
+
+
+
 
 # Luego llama:
-buscar_rut(MAT)
+
 
 
 #COHORTES.loc[COHORTES['COH']==1, ['ANHO_ING',
@@ -329,55 +333,3 @@ MAT.groupby(['cod_plan',
 .to_clipboard()
 )
 
-(
-MAT[MAT['CODIGO_CARRERA']=="MAGCM"]
-.groupby(['ANHO_ING',
-          'sexo',
-          'CODIGO_CARRERA',
-          'cod_plan',
-          'COH_CIDI',
-          'COH',
-          'SIES',
-          'ANHO_MAT'])['rut']
-.nunique()
-.reset_index(name='Total')
-.to_clipboard()
-)
-
-(
-MAT[(MAT['NIVEL_GLOBAL']=="MAGISTER") | 
-    (MAT['NIVEL_GLOBAL']=="DOCTORADO")]
-.groupby([ 'cod_plan',
-          'CODIGO_CARRERA',
-          'NIVEL_GLOBAL',
-          'FACULTAD'])['rut']
-.nunique()
-)
-
-
-
-
-
-rut = MAT.loc[MAT['CODIGO_CARRERA'] == "MAGCM", 'rut'].drop_duplicates().tolist()
-
-
-rut_2 = []
-for i in MAT['rut']:
-    if i in rut:
-        print(i)
-        rut_2.append(i)
-
-pd.DataFrame(rut_2).drop_duplicates()
-
-(
-MAT[MAT['rut'].isin(rut)][['rut', 
-                           'CODIGO_CARRERA', 
-                           'sexo',
-                           'NIVEL_GLOBAL',
-                           'ANHO_ING',
-                           'ANHO_MAT',
-                           'COH',
-                           'COH_CIDI']]
-.drop_duplicates()
-.to_clipboard()
-)

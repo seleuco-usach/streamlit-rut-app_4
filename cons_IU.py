@@ -114,6 +114,9 @@ print(infra_2025.head())
 
 infra_2025['anho']="2025"
 
+infra_2025['anho_ref']=infra_2025['FEC_REF'].astype(str).str[:4]
+
+infra_2025=infra_2025[infra_2025['anho_ref']=='2025']
 
 
 len(set(infra_2025.columns) & 
@@ -133,7 +136,6 @@ dfs = [infra_2020,
        infra_2024, 
        infra_2025]
 
-
 for col in infra_2020:
     infra_2020[col] = (
         infra_2020[col]
@@ -146,8 +148,6 @@ for col in infra_2020.columns[infra_2020.columns.str.contains("TOTAL", regex=Tru
         .astype(str)
         .str.replace(",", ".")
         .astype(float))
-
-
 
 for col in infra_2021.columns[infra_2021.columns.str.contains("TOTAL", regex=True)]:
     infra_2021[col] = (
@@ -196,12 +196,19 @@ for i in range(2020, 2026):
 
 infra_cons=reduce(lambda left, right: pd.merge(left, right, how='outer'), dfs)
 
-reduce(lambda left, right: pd.merge(left, right, how='outer'), dfs)
+infra_cons=infra_cons.iloc[:, :len(set(infra_2025.columns) & 
+    set(infra_2024.columns) &
+    set(infra_2023.columns) &
+    set(infra_2022.columns) &
+    set(infra_2021.columns) &
+    set(infra_2020.columns))]
 
 infra_cons=infra_cons[['anho'] + [col for col in infra_cons.columns if col!= 'anho']]
 
-infra_2021['TOTAL_M2_EDIFICADOS'].info()
+#infra_2021['TOTAL_M2_EDIFICADOS'].info()
 
 infra_cons.to_clipboard()
 
-infra_2024['SITUACION_TENENCIA']
+infra_cons['FECHA_INICIO_TENENCIA'].value_counts()
+
+infra_cons['anho'].value_counts()

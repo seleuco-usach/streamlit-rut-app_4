@@ -29,12 +29,13 @@ st.subheader("Retencion 2007 - 2025")
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import pandas as pd
+import numpy as np
 from gspread_dataframe import set_with_dataframe
 
 # Abrir la hoja de cálculo por ID
 scope = ['https://spreadsheets.google.com/feeds',
          'https://www.googleapis.com/auth/drive']
-credentials = ServiceAccountCredentials.from_json_keyfile_name('/home/xenomorfo/Descargas/bamboo-sweep-465617-i4-06b9bd6f36a5.json', scope)
+credentials = ServiceAccountCredentials.from_json_keyfile_name('/home/xenomorfo/GoogleDrive/codigos/bamboo-sweep-465617-i4-06b9bd6f36a5.json', scope)
 client = gspread.authorize(credentials)
 
 
@@ -80,11 +81,27 @@ tabla_ret=(tabla_ret.groupby(['ANHO_ING',])
 )
 
 
-st.line_chart(
-    data=tabla_ret,
-    x="ANHO_ING",
-    y=["ret_1", "ret_2", "ret_3"]
+tabla_ret=tabla_ret[['ANHO_ING','ret_1', 
+                     'ret_2', 'ret_3']].replace(0, np.nan)
+
+#st.line_chart(
+ #   data=tabla_ret,
+  #  x="ANHO_ING",
+   # y=["ret_1", "ret_2", "ret_3"]
+#)
+
+import altair as alt
+
+chart = alt.Chart(tabla_ret).mark_line().encode(
+    x="ANHO_ING:O",
+    y=alt.Y("value:Q"),
+    color="variable:N"
+).transform_fold(
+    ["ret_1", "ret_2", "ret_3"], 
+    as_=["variable", "value"]
 )
+
+st.altair_chart(chart, use_container_width=True)
 
 
 #st.line_chart(tabla_ret)
