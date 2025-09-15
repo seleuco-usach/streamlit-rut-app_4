@@ -26,7 +26,7 @@ st.subheader("Retencion 2007 - 2025")
  #   columns=['grupo','Serie A', 'Serie B', 'Serie C']
 #)
 
-import gspread
+
 #from oauth2client.service_account import ServiceAccountCredentials
 import pandas as pd
 import numpy as np
