@@ -67,10 +67,16 @@ chart = alt.Chart(tabla_ret).mark_line().encode(
 st.altair_chart(chart, use_container_width=True)
 
 
-st.radio("Selecciona la retención a visualizar:", 
+tabla_ret_largo=tabla_ret.melt(id_vars=['ANHO_ING'], 
+             value_vars=['ret_1', 'ret_2', 'ret_3'])
+
+ret_sel = st.radio("Selecciona la retención a visualizar:", 
          ('ret_1', 'ret_2', 'ret_3'), index=0)
 
+
 #st.line_chart(tabla_ret)
+
+tabla_ret_largo_filtrado=tabla_ret_largo[tabla_ret_largo['variable']==ret_sel]
 
 
 
