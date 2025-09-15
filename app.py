@@ -76,7 +76,7 @@ ret_sel = st.radio("Selecciona la retención a visualizar:",
 
 tabla_ret_largo_filtrado=tabla_ret_largo[tabla_ret_largo['variable']==ret_sel]
 
-chart = alt.Chart(tabla_ret).mark_line().encode(
+chart_fil = alt.Chart(tabla_ret).mark_line().encode(
     x="ANHO_ING:O",
     y=alt.Y(ret_sel, title = "Retención"),
     color="variable:N"
@@ -85,6 +85,7 @@ chart = alt.Chart(tabla_ret).mark_line().encode(
     as_=["variable", "value"]
 )
 
+st.altair_chart(chart_fil, use_container_width=True)
 
 # Contador de clics
 if "contador" not in st.session_state:
