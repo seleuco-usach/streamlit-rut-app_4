@@ -27,50 +27,41 @@ st.subheader("Retencion 2007 - 2025")
 #)
 
 import gspread
-from oauth2client.service_account import ServiceAccountCredentials
+#from oauth2client.service_account import ServiceAccountCredentials
 import pandas as pd
 import numpy as np
-from gspread_dataframe import set_with_dataframe
-
-# Abrir la hoja de cálculo por ID
-scope = ['https://spreadsheets.google.com/feeds',
-         'https://www.googleapis.com/auth/drive']
-credentials = ServiceAccountCredentials.from_json_keyfile_name('/home/xenomorfo/GoogleDrive/codigos/bamboo-sweep-465617-i4-06b9bd6f36a5.json', scope)
-client = gspread.authorize(credentials)
+#from gspread_dataframe import set_with_dataframe
 
 
-spreadsheet = client.open_by_key('1paFv1Dn2mcRubtCgVHL1xPmLPN9T9bvZr4JGVGqByaU')
 
-credentials = ServiceAccountCredentials.\
-from_json_keyfile_name('/home/xenomorfo/Descargas/bamboo-sweep-465617-i4-06b9bd6f36a5.json', scope)
+tabla_ret=pd.read_csv("tabla_ret.csv")
 
-worksheet = spreadsheet.get_worksheet(5)  # índice 0 es la primera hoja
-tabla_ret = worksheet.get_all_values()
 
-#tabla_ret= pd.DataFrame(tabla_ret[1:], columns=tabla_ret[0])
 
-tabla_ret=pd.DataFrame(tabla_ret[1:], columns=tabla_ret[0])
 
-tabla_ret['ret_1']=(
-tabla_ret['ret_1']
-.str.replace(",", ".")
-.replace('','0')
-.astype(float)
-)
+#tabla_ret['ret_1']=(
+#tabla_ret['ret_1']
+#.astype(str)
+#.str.replace(",", ".")
+#.replace('','0')
+#.astype(float)
+#)
 
-tabla_ret['ret_2']=(
-tabla_ret['ret_2']
-.str.replace(",", ".")
-.replace('','0')
-.astype(float)
-)
+#tabla_ret['ret_2']=(
+#tabla_ret['ret_2']
+#.astype(str)
+#.str.replace(",", ".")
+#.replace('','0')
+#.astype(float)
+#)
 
-tabla_ret['ret_3']=(
-tabla_ret['ret_3']
-.str.replace(",", ".")
-.replace('','0')
-.astype(float)
-)
+#tabla_ret['ret_3']=(
+#tabla_ret['ret_3']
+#.astype(str)
+#.str.replace(",", ".")
+#.replace('','0')
+#.astype(float)
+#)
 
 
 tabla_ret=(tabla_ret.groupby(['ANHO_ING',])
@@ -81,8 +72,9 @@ tabla_ret=(tabla_ret.groupby(['ANHO_ING',])
 )
 
 
-tabla_ret=tabla_ret[['ANHO_ING','ret_1', 
-                     'ret_2', 'ret_3']].replace(0, np.nan)
+#tabla_ret=tabla_ret[['ANHO_ING','ret_1', 
+#                     'ret_2', 'ret_3']].replace(0, np.nan)
+
 
 #st.line_chart(
  #   data=tabla_ret,
