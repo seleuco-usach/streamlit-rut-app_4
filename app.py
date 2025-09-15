@@ -21,48 +21,12 @@ st.write(f"Hola, **{nombre}** 👋")
 st.subheader("Retencion 2007 - 2025")
 
 
-#df = pd.DataFrame(
- #   np.random.randn(20, 4),
- #   columns=['grupo','Serie A', 'Serie B', 'Serie C']
-#)
-
-
-#from oauth2client.service_account import ServiceAccountCredentials
 import pandas as pd
 import numpy as np
-#from gspread_dataframe import set_with_dataframe
 
 
 
 tabla_ret=pd.read_csv("tabla_ret.csv")
-
-
-
-
-#tabla_ret['ret_1']=(
-#tabla_ret['ret_1']
-#.astype(str)
-#.str.replace(",", ".")
-#.replace('','0')
-#.astype(float)
-#)
-
-#tabla_ret['ret_2']=(
-#tabla_ret['ret_2']
-#.astype(str)
-#.str.replace(",", ".")
-#.replace('','0')
-#.astype(float)
-#)
-
-#tabla_ret['ret_3']=(
-#tabla_ret['ret_3']
-#.astype(str)
-#.str.replace(",", ".")
-#.replace('','0')
-#.astype(float)
-#)
-
 
 tabla_ret=(tabla_ret.groupby(['ANHO_ING',])
 .agg({'ret_1': 'mean', 
@@ -82,7 +46,14 @@ tabla_ret=(tabla_ret.groupby(['ANHO_ING',])
    # y=["ret_1", "ret_2", "ret_3"]
 #)
 
+#import plotly.express as px
+
+
 import altair as alt
+
+#px.line(tabla_ret, x='ANHO_ING', y=['ret_1', 
+ #                                  'ret_2', 
+  #                                 'ret_3']) 
 
 chart = alt.Chart(tabla_ret).mark_line().encode(
     x="ANHO_ING:O",
@@ -95,6 +66,9 @@ chart = alt.Chart(tabla_ret).mark_line().encode(
 
 st.altair_chart(chart, use_container_width=True)
 
+
+st.radio("Selecciona la retención a visualizar:", 
+         ('ret_1', 'ret_2', 'ret_3'), index=0)
 
 #st.line_chart(tabla_ret)
 
