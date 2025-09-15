@@ -46,7 +46,7 @@ tabla_ret=(tabla_ret.groupby(['ANHO_ING',])
    # y=["ret_1", "ret_2", "ret_3"]
 #)
 
-import plotly.express as px
+#import plotly.express as px
 import altair as alt
 
 #px.line(tabla_ret, x='ANHO_ING', y=['ret_1', 
@@ -76,11 +76,14 @@ ret_sel = st.radio("Selecciona la retención a visualizar:",
 
 tabla_ret_largo_filtrado=tabla_ret_largo[tabla_ret_largo['variable']==ret_sel]
 
-px.bar(tabla_ret_largo_filtrado, 
-             x='ANHO_ING', 
-             y='value',
-             color='variable',  # Mantiene el color por variable
-             title=f"Retención - {ret_sel}")
+chart = alt.Chart(tabla_ret).mark_line().encode(
+    x="ANHO_ING:O",
+    y=alt.Y(ret_sel, title = "Retención"),
+    color="variable:N"
+).transform_fold(
+    ["ret_1", "ret_2", "ret_3"], 
+    as_=["variable", "value"]
+)
 
 
 # Contador de clics
