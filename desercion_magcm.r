@@ -18,9 +18,12 @@ write_clip(COH_RET_REG_ALT%>%
 
 
 clipr::write_clip(COH_RET_REG_ALT %>% 
-            mutate(DESERTA=ifelse(RET_1 == 0 | RET_2 == 0, 1, 0)) %>%
+            mutate(DESERTA=ifelse(RET_1 == 0 | RET_2 == 0, 1, 0),
+            RUT_ANHO=paste(RUT, ANHO.x, sep = "-")) %>%
             filter(CODIGO_CARRERA.x == "MAGCM") %>%
-            select(RUT, SEXO,
+            select(RUT_ANHO,
+                   RUT,
+                   SEXO,
                    CODIGO_CARRERA.x,
                    ANHO.x,
                    RET_1,

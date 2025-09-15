@@ -6,10 +6,6 @@ Created on Mon Aug 18 10:27:34 2025
 @author: xenomorfo
 """
 
-
-
-
-
 import pyodbc
 import pandas as pd
 import numpy as np
@@ -23,6 +19,10 @@ con_1 = pyodbc.connect(
     f"PWD=Estudio.2024;")
 
 print("Conexión exitosa")
+
+
+
+
 
 ####listado de tablas
 cursor_1 = con_1.cursor()

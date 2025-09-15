@@ -213,7 +213,8 @@ pd.set_option('display.width', None)
 (
 titulados_coh[(titulados_coh['NIVEL_TIT_GRADO']=="TERMINAL") &
               (titulados_coh['CODIGO_CARRERA']=="MAGCM")]
-.groupby(['ANHO', 
+.groupby(['RUT',
+          'ANHO', 
           'CODIGO_CARRERA',
           'NIVEL_TIT_GRADO',
           'ANHO_TIT',

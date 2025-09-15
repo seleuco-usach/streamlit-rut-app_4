@@ -6,7 +6,7 @@ Created on Fri May 30 10:54:08 2025
 @author: xenomorfo
 """
 
-
+# %%
 import pyodbc
 import pandas as pd
 import numpy as np
@@ -34,7 +34,7 @@ for t in cursor_1.fetchall():
 
 cursor_1 = con_1.cursor()
 columnas=cursor_1.execute("SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.\
-                          COLUMNS WHERE TABLE_NAME='TABLA_MU';")
+                          COLUMNS WHERE TABLE_NAME='MU_SIES';")
 
 for c in columnas.fetchall():
     print(c)
@@ -66,6 +66,8 @@ MAT=pd.read_sql("""
                 d.PUNTAJE_PONDERADO,
                 d.MATEMATICA,
                 d.COMP_LECT,
+                d.PTJE_NEM,
+                d.PTJE_RANKING,
                 c.SIES,
                 o.Tipo_Carrera,
                 o.Jornada,
@@ -123,6 +125,8 @@ MAT=pd.read_sql("""
                 d.PUNTAJE_PONDERADO,
                 d.MATEMATICA,
                 d.COMP_LECT,
+                d.PTJE_NEM,
+                d.PTJE_RANKING,
                 c.SIES,
                 o.Tipo_Carrera,
                 o.Jornada,
@@ -223,6 +227,7 @@ MAT['INFORMADO_SIES']=MAT['ANHO_SIES_RUT'].isin(informado_sies_2['ANHO_SIES_RUT'
         #                       'SIES']])
 #else: print("no encontrado")
 
+
 def buscar_rut(MAT):
     rut_buscado = int(input("Ingresa rut: "))
     if rut_buscado in MAT['rut'].values:
@@ -233,10 +238,11 @@ def buscar_rut(MAT):
             'fecha_nac', 
             'CODIGO_CARRERA', 
             'cod_plan', 
-            'SIES',
+            'PTJE_NEM',
             'GRUPO_DEPENDENCIA',
             'via_ingreso',
-            'COH'
+            'COH',
+            'COH_CIDI'
         ]])
     else:
         print("no encontrado")
@@ -244,7 +250,7 @@ def buscar_rut(MAT):
 # Luego llama:
 buscar_rut(MAT)
 
-
+19828443
 #COHORTES.loc[COHORTES['COH']==1, ['ANHO_ING',
 #                                  'CODIGO_CARRERA_x', 
  #                                 'RET_1']]
@@ -381,3 +387,6 @@ MAT[MAT['rut'].isin(rut)][['rut',
 .drop_duplicates()
 .to_clipboard()
 )
+
+
+# %%

@@ -47,6 +47,13 @@ VIA_ING_ANIO=c(81,63,26,29,	21,	66,	50,	15,	20,	49,	17,	60,	72,	43,	71,	10,
               70,53,30,54,	55,	44,	16,	87,	95,	97,	85,	37,	68,	86,	19,	75,	
               64,62,76,27,	14,	77,	11,	74,	65,	12,	84,	73,	18,	83,	61, 99)
 
+
+VIA_ING_ANIO_CIDI=c(10,11,12,13,	14,	15,	16,	17,	18,	19,	20,	21,	22,	
+                   23,24,25,26,	27,	28, 29, 30, 31, 33,	34,	37,	38,	
+                   39,40,41,43,	44,	49,	50,	52,	53,	54,	55, 57, 58,
+                   59,60,61,62,	63,	64,	65,	66,	68,	70,	71,	72,	73,	
+                   74,75,76,77,	78,	80,	79,	81,	82,	83,	84,	85,	86,	
+                   87,88,89,91,	92,	95,	97,	99)
 ######Carga Tabla Matrícula##########
 #MAT<-
 #data.frame(tbl(con_2, "MATRICULA_ESTUDIOS_AL_20240502")) %>% 
@@ -77,7 +84,7 @@ VIA_ING_ANIO=c(81,63,26,29,	21,	66,	50,	15,	20,	49,	17,	60,	72,	43,	71,	10,
 
 
 MAT<-
-tbl(con_3, "MATRICULA") %>% 
+tbl(con_3, "MATRICULA_V2_082025_PARA_TODO") %>% 
   mutate(
     rut = as.numeric(rut),
     ANHO = substr(periodo_matricula, 1, 4),
@@ -141,6 +148,8 @@ MAT <-
   #) %>%
   #summarise(freq = n_distinct(RUT)) %>% collect()
 
+library(languageserver)
+
 COH<-
 tbl(con_3, "MATRICULA") %>%
   mutate(
@@ -149,7 +158,8 @@ tbl(con_3, "MATRICULA") %>%
     ANHO_ING = substr(ingreso_plan, 1, 4),
     ANHO_PLAN = paste0(as.character(ANHO), "-", as.character(cod_plan)),
     ING_2030 = ifelse(cod_carr_prog %in% ing_2030, 1, 0),
-    COH = ifelse(cod_via %in% VIA_ING_ANIO & ANHO_ING == ANHO, 1, 0)
+    COH = ifelse(cod_via %in% VIA_ING_ANIO & ANHO_ING == ANHO, 1, 0),
+    COH_CIDI = ifelse(cod_via %in% VIA_ING_ANIO_CIDI & ANHO_ING == ANHO, 1, 0),
   ) %>%
   rename(RUT = rut,
          COD_PLAN = cod_plan,
@@ -206,12 +216,13 @@ BASE_RET_ALT$ANHO.y<-
 ###Construcción NIVEL GLOBAL################
 
 BASE_RET_ALT<-
-  cbind(BASE_RET_ALT, NIVEL_GLOBAL=with(BASE_RET_ALT, 
-                                            ifelse(substr(CODIGO_CARRERA.x,1,3)=="DOC", "DOCTORADO",
-                                            ifelse(substr(CODIGO_CARRERA.x,1,3)=="MAG", "MAGISTER", 
-                                            ifelse(substr(CODIGO_CARRERA.x,1,3)=="DIP", "DIPLOMADO",
-                                            ifelse(substr(CODIGO_CARRERA.x,1,3)=="POS", "POSTÍTULO",
-                                            ifelse(CODIGO_CARRERA.x=="MIDA", "MAGISTER", "PREGRADO")))))))
+  cbind(BASE_RET_ALT, 
+  NIVEL_GLOBAL=with(BASE_RET_ALT,
+    ifelse(substr(CODIGO_CARRERA.x,1,3) == "DOC", "DOCTORADO",
+    ifelse(substr(CODIGO_CARRERA.x,1,3) == "MAG", "MAGISTER", 
+    ifelse(substr(CODIGO_CARRERA.x,1,3) == "DIP", "DIPLOMADO",
+    ifelse(substr(CODIGO_CARRERA.x,1,3) == "POS", "POSTÍTULO",
+    ifelse(CODIGO_CARRERA.x == "MIDA", "MAGISTER", "PREGRADO")))))))
 
 
 
@@ -247,12 +258,13 @@ BASE_RET_ALT <-
 ###Calculo retención primer año##########
 
 BASE_RET_ALT<-
-  cbind(BASE_RET_ALT, RET_1=with(BASE_RET_ALT, ifelse(ANHO.x!=ANHO.y & 
-                                                        ANHO.y-ANHO.x==1 & 
-                                                        COD_PLAN.x==COD_PLAN.y, 1,
-                                               ifelse(ANHO.x!=ANHO.y & ANHO.y-ANHO.x==1 & 
-                                                        COD_PLAN.x!=COD_PLAN.y & 
-                                                        CODIGO_CARRERA.x==CODIGO_CARRERA.y,1,0))))
+  cbind(BASE_RET_ALT, 
+  RET_1=with(BASE_RET_ALT, 
+  ifelse(ANHO.x!=ANHO.y & ANHO.y-ANHO.x==1 &
+  COD_PLAN.x==COD_PLAN.y, 1,
+  ifelse(ANHO.x!=ANHO.y & ANHO.y-ANHO.x==1 &
+  COD_PLAN.x!=COD_PLAN.y & 
+  CODIGO_CARRERA.x==CODIGO_CARRERA.y,1,0))))
 
 BASE_RET_ALT<-
   cbind(BASE_RET_ALT, RET_INST=with(BASE_RET_ALT, 
@@ -448,6 +460,8 @@ COH_RET_REG_ALT$RET_2_ING_2030[is.na(COH_RET_REG_ALT$RET_2_ING_2030)]<-0
 COH_RET_REG_ALT$RET_3_ING_2030[is.na(COH_RET_REG_ALT$RET_3_ING_2030)]<-0
 COH_RET_REG_ALT$RET_4_ING_2030[is.na(COH_RET_REG_ALT$RET_4_ING_2030)]<-0
 
+
+COH_RET_REG_ALT
 ################base retención################################
 
 write_clip(COH_RET_REG_ALT %>% group_by(ANHO.x, COD_PLAN.x, NIVEL_GLOBAL,
