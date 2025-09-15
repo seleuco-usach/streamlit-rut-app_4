@@ -15,7 +15,7 @@ st.title("Retencion USACH")
 
 # Entrada de texto
 nombre = st.text_input("¿Cuál es tu nombre?", "Invitado")
-st.write(f"Hola, **{nombre}** 👋")
+st.write(f"La retención disminuye a medida que aumenta el año de ingreso")
 
 # Generar y mostrar un gráfico
 st.subheader("Retencion 2007 - 2025")
@@ -28,7 +28,7 @@ import numpy as np
 
 tabla_ret=pd.read_csv("tabla_ret.csv")
 
-tabla_ret=(tabla_ret.groupby(['ANHO_ING',])
+tabla_ret_agrupada=(tabla_ret.groupby(['ANHO_ING',])
 .agg({'ret_1': 'mean', 
       'ret_2': 'mean', 
       'ret_3': 'mean'})
@@ -53,7 +53,7 @@ import altair as alt
  #                                  'ret_2', 
   #                                 'ret_3']) 
 
-chart = alt.Chart(tabla_ret).mark_line().encode(
+chart = alt.Chart(tabla_ret_agrupada).mark_line().encode(
     x="ANHO_ING:O",
     y=alt.Y("value:Q"),
     color="variable:N"
@@ -65,14 +65,19 @@ chart = alt.Chart(tabla_ret).mark_line().encode(
 st.altair_chart(chart, use_container_width=True)
 
 
-tabla_ret_largo=tabla_ret.melt(id_vars=['ANHO_ING'], 
+tabla_ret_largo=tabla_ret_agrupada.melt(id_vars=['ANHO_ING'], 
              value_vars=['ret_1', 'ret_2', 'ret_3'])
 
+
+
 ret_sel = st.radio("Selecciona la retención a visualizar:", 
-         ('ret_1', 'ret_2', 'ret_3'), index=0)
+         ('ret_1', 'ret_2', 'ret_3', "todo"), index=0)
 
-
+ret_sel = st.radio("Selecciona la retención a visualizar:", 
+         (tabla_ret['CODIGO_CARRERA_x'].unique()), index=0)
 #st.line_chart(tabla_ret)
+
+    
 
 tabla_ret_largo_filtrado=tabla_ret_largo[tabla_ret_largo['variable']==ret_sel]
 
