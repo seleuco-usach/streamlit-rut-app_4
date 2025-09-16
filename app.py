@@ -73,8 +73,8 @@ tabla_ret_largo=tabla_ret_agrupada.melt(id_vars=['ANHO_ING'],
 ret_sel = st.radio("Selecciona la retención a visualizar:", 
          ('ret_1', 'ret_2', 'ret_3', "todo"), index=0)
 
-ret_sel = st.radio("Selecciona la retención a visualizar:", 
-         (tabla_ret['CODIGO_CARRERA_x'].unique()), index=0)
+ret_sel = st.selectbox("Selecciona la retención a visualizar:", 
+         (tabla_ret['CODIGO_CARRERA_x'].unique()))
 #st.line_chart(tabla_ret)
 
     
