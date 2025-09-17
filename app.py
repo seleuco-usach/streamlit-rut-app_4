@@ -107,7 +107,7 @@ tabla_ret_largo_filtrado=tabla_ret_largo[tabla_ret_largo['variable']==ret_sel]
 
 chart_fil = alt.Chart(tabla_ret_agrupada_carr).mark_line().encode(
     x="ANHO_ING:O",
-    y=alt.Y(ret_sel, title = "Retención"),
+    y=alt.Y(ret_sel_carr, title = "Retención"),
     color="variable:N"
 ).transform_fold(
     ["ret_1", "ret_2", "ret_3"], 
