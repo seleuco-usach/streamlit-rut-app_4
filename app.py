@@ -35,7 +35,13 @@ tabla_ret_agrupada=(tabla_ret.groupby(['ANHO_ING',])
 .reset_index()
 )
 
-
+tabla_ret_agrupada_carr=(tabla_ret.groupby(['ANHO_ING',
+                                            'CODIGO_CARRERA_x'])
+.agg({'ret_1': 'mean', 
+      'ret_2': 'mean', 
+      'ret_3': 'mean'})
+.reset_index()
+)
 #tabla_ret=tabla_ret[['ANHO_ING','ret_1', 
 #                     'ret_2', 'ret_3']].replace(0, np.nan)
 
@@ -53,14 +59,30 @@ import altair as alt
  #                                  'ret_2', 
   #                                 'ret_3']) 
 
-chart = alt.Chart(tabla_ret_agrupada).mark_line().encode(
-    x="ANHO_ING:O",
-    y=alt.Y("value:Q"),
-    color="variable:N"
-).transform_fold(
-    ["ret_1", "ret_2", "ret_3"], 
-    as_=["variable", "value"]
+#chart = alt.Chart(tabla_ret_agrupada).mark_line().encode(
+ #   x="ANHO_ING:O",
+  #  y=alt.Y("value:Q"),
+   # color="variable:N"
+#).transform_fold(
+ ##  as_=["variable", "value"]
+#)
+
+
+chart = (
+    alt.Chart(tabla_ret_agrupada)
+    .transform_fold(
+        ["ret_1", "ret_2", "ret_3"],
+        as_=["variable", "value"]
+    )
+    .mark_line()
+    .encode(
+        x="ANHO_ING:O",
+        y=alt.Y("value:Q"),
+        color="variable:N"
+    )
 )
+
+
 
 st.altair_chart(chart, use_container_width=True)
 
@@ -68,7 +90,9 @@ st.altair_chart(chart, use_container_width=True)
 tabla_ret_largo=tabla_ret_agrupada.melt(id_vars=['ANHO_ING'], 
              value_vars=['ret_1', 'ret_2', 'ret_3'])
 
-
+tabla_ret_largo_carr=tabla_ret_agrupada_carr.melt(id_vars=['ANHO_ING', 
+                                      'CODIGO_CARRERA_x'], 
+             value_vars=['ret_1', 'ret_2', 'ret_3'])
 
 ret_sel = st.radio("Selecciona la retención a visualizar:", 
          ('ret_1', 'ret_2', 'ret_3', "todo"), index=0)
@@ -81,7 +105,7 @@ ret_sel_carr = st.selectbox("Selecciona la retención a visualizar:",
 
 tabla_ret_largo_filtrado=tabla_ret_largo[tabla_ret_largo['variable']==ret_sel]
 
-chart_fil = alt.Chart(tabla_ret_agrupada).mark_line().encode(
+chart_fil = alt.Chart(tabla_ret_agrupada_carr).mark_line().encode(
     x="ANHO_ING:O",
     y=alt.Y(ret_sel, title = "Retención"),
     color="variable:N"
