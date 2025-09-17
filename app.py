@@ -36,7 +36,7 @@ tabla_ret['NIVEL_GLOBAL']=np.where(tabla_ret['CODIGO_CARRERA_x']=="UNICIT", "UNI
     np.where(tabla_ret['CODIGO_CARRERA_x'].str[0:3]=="POS","POSTITUTLO","PREGRADO"))))))
 
 
-tabla_ret=tabla_ret[tabla_ret['NIVEL_GLOBAL']=="PREGRADO"]
+tabla_ret=tabla_ret[tabla_ret['NIVEL_GLOBAL']!="DIPLOMADO"]
 
 tabla_ret_agrupada=(tabla_ret.groupby(['ANHO_ING',])
 .agg({'ret_1': 'mean', 
@@ -118,8 +118,7 @@ ret_sel_carr = st.selectbox("Selecciona la retención a visualizar:",
 
 #tabla_ret_largo_filtrado=tabla_ret_largo[tabla_ret_largo['variable']==ret_sel]
 
-tabla_ret_largo_filtrado_carr=tabla_ret_largo_carr[(tabla_ret_largo_carr['CODIGO_CARRERA_x']==ret_sel_carr) & 
-                                                   (tabla_ret_largo_carr['NIVEL_GLOBAL']=="PREGRADO")]
+tabla_ret_largo_filtrado_carr=tabla_ret_largo_carr[(tabla_ret_largo_carr['CODIGO_CARRERA_x']==ret_sel_carr)]
 
 chart_fil = alt.Chart(tabla_ret_largo_filtrado_carr).mark_line().encode(
     x="ANHO_ING:O",
