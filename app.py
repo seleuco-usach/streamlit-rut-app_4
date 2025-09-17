@@ -105,7 +105,9 @@ ret_sel_carr = st.selectbox("Selecciona la retención a visualizar:",
 
 tabla_ret_largo_filtrado=tabla_ret_largo[tabla_ret_largo['variable']==ret_sel]
 
-chart_fil = alt.Chart(tabla_ret_agrupada_carr).mark_line().encode(
+tabla_ret_largo_filtrado_carr=tabla_ret_largo_carr[tabla_ret_largo_carr['variable']==ret_sel_carr]
+
+chart_fil = alt.Chart(tabla_ret_largo_filtrado_carr).mark_line().encode(
     x="ANHO_ING:O",
     y=alt.Y(ret_sel_carr, title = "Retención"),
     color="variable:N"
