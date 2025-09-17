@@ -111,9 +111,6 @@ chart_fil = alt.Chart(tabla_ret_largo_filtrado_carr).mark_line().encode(
     x="ANHO_ING:O",
     y=alt.Y("value:Q", title = "Retención"),
     color="variable:N"
-).transform_fold(
-    ["ret_1", "ret_2", "ret_3"], 
-    as_=["variable", "value"]
 )
 
 st.altair_chart(chart_fil, use_container_width=True)
