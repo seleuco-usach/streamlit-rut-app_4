@@ -107,7 +107,7 @@ tabla_ret_largo_carr=tabla_ret_agrupada_carr.melt(id_vars=['ANHO_ING',
 #ret_sel = st.radio("Selecciona la retención a visualizar:", 
  #        ('ret_1', 'ret_2', 'ret_3', "todo"), index=0)
 
-ret_sel_carr = st.selectbox("Selecciona la retención a visualizar:", 
+ret_sel_carr = st.selectbox("Selecciona la carrera a visualizar:", 
          tabla_ret['CODIGO_CARRERA_x'].unique())
 
 
@@ -129,14 +129,14 @@ chart_fil = alt.Chart(tabla_ret_largo_filtrado_carr).mark_line().encode(
 st.altair_chart(chart_fil, use_container_width=True)
 
 # Contador de clics
-if "contador" not in st.session_state:
-    st.session_state.contador = 0
+#if "contador" not in st.session_state:
+#    st.session_state.contador = 0
 
-if st.button("¡Haz clic aquí!"):
-    st.session_state.contador += 1
+#if st.button("¡Haz clic aquí!"):
+#    st.session_state.contador += 1
 
-st.write(f"Has hecho clic **{st.session_state.contador}** veces.")
+#st.write(f"Has hecho clic **{st.session_state.contador}** veces.")
 
 # Despedida
-st.markdown("---")
-st.write("Gracias por probar esta demo de Streamlit.")
+#st.markdown("---")
+#st.write("Gracias por probar esta demo de Streamlit.")
