@@ -31,12 +31,14 @@ cursor_1.execute("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.\
 
 for t in cursor_1.fetchall():
     print(t)
-    
+
+
+pd.read_sql("""SELECT * FROM PAC_2008_2024_V4""", con_1).to_csv("PAC_2008_2024_V4.csv", index=False)
 ####listado de campos
 
 cursor_1 = con_1.cursor()
 columnas=cursor_1.execute("SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.\
-                          COLUMNS WHERE TABLE_NAME='MU_PRE_POST_2012_2025';")
+                          COLUMNS WHERE TABLE_NAME='PAC_2008_2024_V4';")
 
 for c in columnas.fetchall():
     print(c)
@@ -80,6 +82,20 @@ MU_SIES=pd.read_sql("""SELECT
             ON CONCAT(s.mm_n_documento, '-',s.periodo_matricula, '-', s.mc_codigo_unico)= CONCAT(d.NUMERO_DOCUMENTO,'-',d.ANYO_PROCESO, '-', d.codigo_unico)""", con_1)
 
 
+#####pedagogias
+
+ped=["PEDHS","PEDCAST","PEDINGLES",
+"PEDFILOS","PEDEGB","PEDMATCOMP",
+"PEDFISMAT","PEDQUIMBIO","PEDEDFIS"]
+
+ped_sies=["I71S1C45J1V1","I71S1C44J1V1"
+"I71S1C41J1V1","I71S1C40J1V1"
+"I71S1C43J1V1","I71S1C149J1V1"
+"I71S1C145J1V2","I71S1C395J1V2"
+"I71S1C146J1V2","I71S1C145J1V1"]
+
+
+MU_SIES['PED'] = MU_SIES['mc_codigo_unico'].isin(ped_sies).astype(int)
 ###tabla mu para calculo de puntajes            
 (
 MU_SIES[MU_SIES['mc_codigo_unico']
@@ -110,7 +126,8 @@ MU_SIES[MU_SIES['periodo_matricula']==2025][[
          'COMP_LECT', 
          'MATEMATICA', 'PAES']].describe().round(2)
 
-MU_SIES[MU_SIES['periodo_matricula'] == 2025][[
+MU_SIES[(MU_SIES['periodo_matricula'] == 2025) & 
+        (MU_SIES['PED'] == 1)][[
          #'mm_n_documento',
          'periodo_matricula',
          'COMP_LECT', 
