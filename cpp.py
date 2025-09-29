@@ -36,5 +36,11 @@ for c in columnas.fetchall():
 pd.read_sql("""SELECT * FROM cpp_cc""", con_1).to_csv("cpp_cc.csv", index=False)
 
 pd.read_sql("""SELECT * FROM CPP_DR""", con_1).to_csv("CPP_DR.csv", index=False)
-
-pd.read_sql("""SELECT * FROM PAC_2008_2025""", con_1).to_csv("PAC_2008_2025.csv", index=False)
+(
+pd.read_sql("""SELECT * FROM PAC_2008_2025""", con_1)
+.to_csv("PAC_2008_2025_v.2.csv", 
+        index=False, 
+        sep=';', 
+        decimal=',', 
+        encoding='utf-8')
+)
