@@ -222,6 +222,35 @@ titulados_coh[(titulados_coh['NIVEL_TIT_GRADO']=="TERMINAL") &
           'SEXO'])['RUT']
 .nunique()
 .reset_index(name="tot tit")
-.to_clipboard()
+#.to_clipboard()
     
+)
+
+(
+titulados_coh[(titulados_coh['NIVEL_TIT_GRADO']=="TERMINAL") &
+              (titulados_coh['CODIGO_CARRERA']=="PER") &
+              (titulados_coh['ANHO_RES'].astype(int)>2014)]
+.groupby(['ANHO', 
+          'CODIGO_CARRERA',
+          'COD_PLAN',
+          'NIVEL_TIT_GRADO',
+          'ANHO_TIT',
+          'ANHO_RES'])['RUT']
+.nunique()
+#.unstack()
+.reset_index(name = "total")
+.to_clipboard()
+)
+
+(
+titulados_coh[(titulados_coh['NIVEL_TIT_GRADO']=="TERMINAL")]
+.groupby(['ANHO', 
+          'CODIGO_CARRERA',
+          'COD_PLAN',
+          'NIVEL_TIT_GRADO',
+          'ANHO_TIT',
+          'ANHO_RES'])['RUT']
+.nunique()
+#.unstack()
+.reset_index(name = "total")
 )

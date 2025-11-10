@@ -12,6 +12,7 @@ import pandas as pd
 import numpy as np
 from datetime import date
 
+
 con_1 = pyodbc.connect(
     f"DRIVER={{ODBC Driver 17 for SQL Server}};"
     f"SERVER=158.170.66.56,{1433};"
@@ -34,14 +35,11 @@ for t in cursor_1.fetchall():
 
 cursor_1 = con_1.cursor()
 columnas=cursor_1.execute("SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.\
-                          COLUMNS WHERE TABLE_NAME='MU_SIES';")
+                          COLUMNS WHERE TABLE_NAME='CPP_DR2';")
 
 for c in columnas.fetchall():
     print(c)
-
-
-MAT=pd.read_sql("""
-            SELECT 
+consulta = """SELECT 
                 m.rut, 
                 m.nombres,
                 m.ap_paterno,
@@ -54,7 +52,7 @@ MAT=pd.read_sql("""
                 LEFT(ingreso_plan, 4) AS ANHO_ING,
                 CONCAT(m.rut, '-',LEFT(m.ingreso_plan, 4)) AS ID,
                 CONCAT(m.rut, '-', LEFT(m.ingreso_plan, 4), '-', m.cod_plan) AS RUT_ANHO_PLAN,
-                CONCAT(LEFT(ingreso_plan, 4), '-',cod_plan) AS ANHO_PLAN,
+                CONCAT(LEFT(ingreso_plan, 4), '-',m.cod_plan) AS ANHO_PLAN,
                 CONCAT(c.SIES, '-', m.rut) AS SIES_RUT,
                 CONCAT(LEFT(m.ingreso_plan, 4),'-' ,c.SIES, '-', m.rut) AS ANHO_SIES_RUT,
                 m.via_ingreso,
@@ -82,11 +80,17 @@ MAT=pd.read_sql("""
                 cc.COD_DEPTO,
                 cc.Columna2 AS depto,
                 mu.NAC,
-                COUNT(m.rut) AS Total
+                COUNT(m.rut) AS Total,        
+                d.INGRESO_PERCAPITA_GRUPO_FA,
+                d.PUNTAJE_PONDERADO,
+                d.MATEMATICA,
+                d.COMP_LECT,
+                d.PTJE_NEM,
+                d.PTJE_RANKING
             FROM MATRICULA_V2_082025_PARA_TODO m
             LEFT JOIN DEMRE_E_2014_2025 d 
             ON CONCAT(m.rut, '-',LEFT(m.ingreso_plan, 4))=d.ID_ANHO
-            LEFT JOIN CPP_DR c
+            LEFT JOIN CPP_DR2 c
             ON CONCAT(LEFT(periodo_matricula,4), '-',m.cod_plan)=c.ANHO_PLAN
             LEFT JOIN OA_SIES_2010_2025_USACH o
             ON CONCAT(c.ANHO, '_', c.SIES)=o.llave
@@ -112,7 +116,117 @@ MAT=pd.read_sql("""
                 CONCAT(m.rut, LEFT(m.ingreso_plan, 4)),
                 CONCAT(m.rut, '-', LEFT(m.ingreso_plan, 4), '-', m.cod_plan),
                 m.cod_carr_prog,
-                CONCAT(LEFT(ingreso_plan, 4), '-',cod_plan),
+                CONCAT(LEFT(ingreso_plan, 4), '-',m.cod_plan),
+                CONCAT(ANHO, '_', SIES),
+                CONCAT(c.SIES, '-', m.rut),
+                CONCAT(LEFT(m.ingreso_plan, 4),'-',c.SIES, '-', m.rut),
+                m.ingreso_plan,
+                m.via_ingreso,
+                m.region,
+                m.fecha_nac,
+                d.GRUPO_DEPENDENCIA,
+                d.INGRESO_PERCAPITA_GRUPO_FA,
+                d.PUNTAJE_PONDERADO,
+                d.MATEMATICA,
+                d.COMP_LECT,
+                d.PTJE_NEM,
+                d.PTJE_RANKING,
+                c.SIES,
+                o.Tipo_Carrera,
+                o.Jornada,
+                o.[Cine-F_13_Área],
+                o.Duración_Total,
+                o.Nivel_Carrera,
+                g.GRATUIDAD,
+                f.TIPO,
+                h.TIPO,
+                cc.COD_FAC,
+                cc.FACULTAD,
+                cc.COD_DEPTO,
+                cc.Columna2,
+                m.cod_via,
+                mu.NAC;"""
+
+
+MAT=pd.read_sql("""
+            SELECT 
+                m.rut, 
+                m.nombres,
+                m.ap_paterno,
+                m.sexo,
+                m.nacionalidad,
+                m.cod_plan,
+                m.carrera_programa,
+                LEFT(periodo_matricula, 4) AS ANHO_MAT,
+                CODIGO_CARRERA=cod_carr_prog,
+                LEFT(ingreso_plan, 4) AS ANHO_ING,
+                CONCAT(m.rut, '-',LEFT(m.ingreso_plan, 4)) AS ID,
+                CONCAT(m.rut, '-', LEFT(m.ingreso_plan, 4), '-', m.cod_plan) AS RUT_ANHO_PLAN,
+                CONCAT(LEFT(ingreso_plan, 4), '-',m.cod_plan) AS ANHO_PLAN,
+                CONCAT(c.SIES, '-', m.rut) AS SIES_RUT,
+                CONCAT(LEFT(m.ingreso_plan, 4),'-' ,c.SIES, '-', m.rut) AS ANHO_SIES_RUT,
+                m.via_ingreso,
+                m.cod_via,
+                m.region,
+                m.fecha_nac,
+                d.GRUPO_DEPENDENCIA,
+                d.INGRESO_PERCAPITA_GRUPO_FA,
+                d.PUNTAJE_PONDERADO,
+                d.MATEMATICA,
+                d.COMP_LECT,
+                d.PTJE_NEM,
+                d.PTJE_RANKING,
+                c.SIES,
+                o.Tipo_Carrera,
+                o.Jornada,
+                o.[Cine-F_13_Área],
+                o.Duración_Total,
+                o.Nivel_Carrera,
+                g.GRATUIDAD,
+                f.TIPO AS CAE,
+                h.TIPO AS FSCU,
+                cc.COD_FAC,
+                cc.FACULTAD,
+                cc.COD_DEPTO,
+                cc.Columna2 AS depto,
+                mu.NAC,
+                COUNT(m.rut) AS Total,        
+                d.INGRESO_PERCAPITA_GRUPO_FA,
+                d.PUNTAJE_PONDERADO,
+                d.MATEMATICA,
+                d.COMP_LECT,
+                d.PTJE_NEM,
+                d.PTJE_RANKING
+            FROM MATRICULA_V2_082025_PARA_TODO m
+            LEFT JOIN DEMRE_E_2014_2025 d 
+            ON CONCAT(m.rut, '-',LEFT(m.ingreso_plan, 4))=d.ID_ANHO
+            LEFT JOIN CPP_DR2 c
+            ON CONCAT(LEFT(periodo_matricula,4), '-',m.cod_plan)=c.ANHO_PLAN
+            LEFT JOIN OA_SIES_2010_2025_USACH o
+            ON CONCAT(c.ANHO, '_', c.SIES)=o.llave
+            LEFT JOIN tb_gratuidad g
+            ON CONCAT(m.rut, '-',LEFT(m.ingreso_plan, 4))=CONCAT(g.Rut,'-',g.AÑO)
+            LEFT JOIN cae f
+            ON CONCAT(m.rut, '-', LEFT(m.ingreso_plan, 4), '-', m.cod_plan)=CONCAT(f.RUN, '-',f.AÑO_ING,'-', f.CODIGO_PLAN)
+            LEFT JOIN fscu h
+            ON CONCAT(m.rut, '-', LEFT(m.ingreso_plan, 4), '-', m.cod_plan)=CONCAT(h.RUN, '-',h.AÑO_ING,'-', h.CODIGO_PLAN)
+            LEFT JOIN centro_costo cc
+            ON cod_carr_prog = [COD CARRERA]
+            LEFT JOIN TABLA_MU mu
+            ON CONCAT(LEFT(m.ingreso_plan, 4),'-' ,c.SIES, '-', m.rut) = CONCAT(mu.ANHO_MU, '-', mu.COD_SIES,'-', mu.N_DOC)
+            GROUP BY
+                m.rut,
+                m.nombres,
+                m.ap_paterno,
+                m.sexo,
+                m.nacionalidad,
+                m.cod_plan,
+                m.carrera_programa,
+                LEFT(periodo_matricula, 4),
+                CONCAT(m.rut, LEFT(m.ingreso_plan, 4)),
+                CONCAT(m.rut, '-', LEFT(m.ingreso_plan, 4), '-', m.cod_plan),
+                m.cod_carr_prog,
+                CONCAT(LEFT(ingreso_plan, 4), '-',m.cod_plan),
                 CONCAT(ANHO, '_', SIES),
                 CONCAT(c.SIES, '-', m.rut),
                 CONCAT(LEFT(m.ingreso_plan, 4),'-',c.SIES, '-', m.rut),
@@ -142,6 +256,8 @@ MAT=pd.read_sql("""
                 cc.Columna2,
                 m.cod_via,
                 mu.NAC;""", con_1)
+
+
 
 ###NIVEL GLOBAL
 MAT['NIVEL_GLOBAL']=np.where(MAT['CODIGO_CARRERA']=="UNICIT", "UNICIT",
@@ -249,6 +365,7 @@ def buscar_rut(MAT):
 
 # Luego llama:
 buscar_rut(MAT)
+
 
 19828443
 #COHORTES.loc[COHORTES['COH']==1, ['ANHO_ING',
@@ -388,5 +505,42 @@ MAT[MAT['rut'].isin(rut)][['rut',
 .to_clipboard()
 )
 
+(
+MAT[MAT['ANHO_MAT']==2024]
+.assign(id = MAT['ANHO_MAT']
+        .astype(str) + '-' + MAT['cod_plan']
+        .astype(str))
+.groupby(['id','cod_plan','ANHO_MAT','NIVEL_GLOBAL'])['rut']
+.nunique()
+.reset_index(name= "n_distinct(RUT)")
+.to_clipboard()
+)
 
+########times ranking
+(
+MAT[MAT['ANHO_ING']==2024]
+.assign(id = MAT['ANHO_ING']
+        .astype(str) + '-' + MAT['cod_plan']
+        .astype(str))
+.groupby(['NIVEL_GLOBAL','sexo','ANHO_ING', 'Tipo_Carrera'])['rut']
+.nunique()
+.reset_index(name= "n_distinct(RUT)")
+.to_clipboard()
+)
+
+(
+MAT[(MAT['ANHO_ING']==2024) & 
+    (MAT['NIVEL_GLOBAL']!="DIPLOMADO") &
+    (MAT['NIVEL_GLOBAL']!="POSTITUTLO")]
+.assign(id = MAT['ANHO_ING']
+        .astype(str) + '-' + MAT['cod_plan']
+        .astype(str))
+.groupby(['NIVEL_GLOBAL',
+          'sexo','ANHO_ING', 
+          'Tipo_Carrera',
+          'cod_plan'])['rut']
+.nunique()
+.reset_index(name= "n_distinct(RUT)")
+#.to_clipboard()
+)
 # %%
